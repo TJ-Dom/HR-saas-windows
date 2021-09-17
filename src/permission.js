@@ -5,7 +5,7 @@ import store from './store'
 import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
 // import { getToken } from '@/utils/auth' // get token from cookie
-// import getPageTitle from '@/utils/get-page-title'
+import getPageTitle from '@/utils/get-page-title'
 
 // NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
@@ -13,6 +13,8 @@ const whiteList = ['/login', '/404'] // 定义白名单  所有不受权限控�
 // 路由的前置守卫
 router.beforeEach(async(to, from, next) => {
   NProgress.start() // 开启进度条
+  // set page title
+  document.title = getPageTitle(to.meta.title)
   //  首先判断有无token
   if (store.getters.token) {
     //   如果有token 继续判断是不是去登录页
