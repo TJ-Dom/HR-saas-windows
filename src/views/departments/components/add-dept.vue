@@ -68,7 +68,8 @@
 import {
   getDepartments,
   addDepartments,
-  getDepartDetail
+  getDepartDetail,
+  updateDepartments
 } from '@/api/departments'
 import { getEmployeeSimple } from '@/api/employees'
 export default {
@@ -91,11 +92,28 @@ export default {
       // 首先获取最新的组织架构数据
       const { depts } = await getDepartments()
       // console.log(depts)
+      //  检查重复规则 需要支持两种 新增模式 / 编辑模式
       // depts是所有的部门数据
-      // 如何去找技术部所有的子节点
-      const isRepeat = depts
-        .filter(item => item.pid === this.treeNode.id)
-        .some(item => item.name === value)
+      let isRepeat = false
+      if (this.formData.id) {
+        // 有id就是编辑模式
+        // 编辑 张三 => 校验规则 除了我之外 同级部门下 不能有叫张三的
+        // 首先要找到我的同级部门 this.formData.id就是我当前的id， 我的pid是this.formData.pid
+        // // this.treeNode.id=this.forData.id
+        isRepeat = depts
+          .filter(
+            item =>
+              item.pid === this.treeNode.pid && item.id !== this.formData.id
+          )
+          .some(item => item.name === value)
+      } else {
+        // 没id就是新增模式
+        // 如何去找部门所有的子节点
+        isRepeat = depts
+          .filter(item => item.pid === this.treeNode.id)
+          .some(item => item.name === value)
+      }
+
       isRepeat
         ? callback(
           new Error(
@@ -107,7 +125,23 @@ export default {
     const checkCodeRepeat = async(rule, value, callback) => {
       // 首先获取最新的组织架构数据
       const { depts } = await getDepartments()
-      const isRepeat = depts.some(item => item.code === value)
+      let isRepeat = false
+      //  检查重复规则 需要支持两种 新增模式 / 编辑模式
+      if (this.formData.id) {
+        // 编辑模式  因为编辑模式下 不能算自己
+        // 笔记
+        isRepeat = depts.some(
+          item => item.id !== this.formData.id && item.code === value && value
+        )
+        // 视频教学
+        // isRepeat = depts
+        //   .filter(item => item.id !== this.treeNode.id)
+        //   .some(item => item.code === value && value)
+      } else {
+        // 新增模式
+        isRepeat = depts.some(item => item.code === value && value) // 这里加一个 value不为空 因为我们的部门有可能没有code
+      }
+
       isRepeat
         ? callback(
           new Error(
@@ -185,10 +219,17 @@ export default {
     },
     // 点击确定时触发
     btnOK() {
+      // 手动校验表单
       this.$refs.deptForm.validate(async isOK => {
         if (isOK) {
-          // 表示可以提交了
-          await addDepartments({ ...this.formData, pid: this.treeNode.id }) // 调用新增接口 添加父部门的id
+          // 表示可以提交了 // 要分清楚现在是编辑还是新增
+          if (this.formData.id) {
+            // 有id=> 编辑模式  调用编辑接口
+            await updateDepartments(this.formData)
+          } else {
+            // 没id=> 新增模式
+            await addDepartments({ ...this.formData, pid: this.treeNode.id }) // 调用新增接口 添加父部门的id
+          }
           // 同样，在新增成功之后，调用告诉父组件，重新拉取数据
           this.$emit('addDepts')
           // 利用sync修饰符关闭新增弹层 // update:props名称
