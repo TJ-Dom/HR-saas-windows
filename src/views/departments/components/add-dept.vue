@@ -2,7 +2,7 @@
   <!-- 新增部门的弹层 -->
   <el-dialog
     class="AddDept"
-    title="新增部门"
+    :title="showTitle"
     :visible="showDialog"
     @close="btnCancel"
   >
@@ -65,7 +65,11 @@
 </template>
 
 <script>
-import { getDepartments, addDepartments } from '@/api/departments'
+import {
+  getDepartments,
+  addDepartments,
+  getDepartDetail
+} from '@/api/departments'
 import { getEmployeeSimple } from '@/api/employees'
 export default {
   components: {},
@@ -162,13 +166,22 @@ export default {
       }
     }
   },
-  computed: {},
+  computed: {
+    showTitle() {
+      return this.formData.id ? '编辑部门' : '新增子部门'
+    }
+  },
   watch: {},
   // created() {},
   // mounted() {},
   methods: {
+    // 获取简单部门信息
     async getEmployeeSimple() {
       this.peoples = await getEmployeeSimple()
+    },
+    // 获取部门详情
+    async getDepartDetail(id) {
+      this.formData = await getDepartDetail(id)
     },
     // 点击确定时触发
     btnOK() {
@@ -184,9 +197,16 @@ export default {
       })
     },
     btnCancel() {
+      // 重置数据  因为resetFields 只能重置 表单上的数据 非表单上的 比如 编辑中id 不能重置
+      this.formData = {
+        name: '', // 部门名称
+        code: '', // 部门编码
+        manager: '', // 部门管理者
+        introduce: '' // 部门介绍
+      }
       // 子组件 update:固定写法 (update:props名称, 值)
       this.$refs.deptForm.resetFields() // 重置校验字段
-      this.$emit('update:showDialog', false) // 关闭
+      this.$emit('update:showDialog', false) // 关闭弹层
     }
   }
 }

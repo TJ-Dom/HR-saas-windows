@@ -17,10 +17,12 @@
             :tree-node="data"
             @delDepts="getDepartments"
             @addDepts="addDepts"
+            @editDepts="editDepts"
           />
         </el-tree>
       </el-card>
       <AddDept
+        ref="addDept"
         :show-dialog.sync="showDialog"
         :tree-node="node"
         @addDepts="getDepartments"
@@ -65,9 +67,19 @@ export default {
       this.departs = tranListToTreeData(result.depts, '')
       this.company = { name: result.companyName, manager: '负责人', id: '' }
     },
+    // 新增部门节点
     addDepts(node) {
-      this.showDialog = true
-      this.node = node
+      // 首先打开弹层
+      this.showDialog = true // 显示新增组件弹层
+      this.node = node // 赋值操作的节点
+    },
+    // 编辑部门节点
+    editDepts(node) {
+      // 首先打开弹层
+      this.showDialog = true // 显示新增组件弹层
+      this.node = node // 赋值操作的节点 // 存储传递过来的node数据
+      // 应该在这里调用获取部门详情的方法=》 调用子组件的方法 父组件 调用子组件的方法
+      this.$refs.addDept.getDepartDetail(node.id) // 直接调用子组件中的方法 传入一个id
     }
   }
 }
