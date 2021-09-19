@@ -25,7 +25,10 @@
               首页
             </el-dropdown-item>
           </router-link>
-          <a target="_blank" href="https://github.com/TJ-Dom/HR-saas-windows.git">
+          <a
+            target="_blank"
+            href="https://github.com/TJ-Dom/HR-saas-windows.git"
+          >
             <el-dropdown-item>项目地址</el-dropdown-item>
           </a>
           <el-dropdown-item divided @click.native="logout">
@@ -43,10 +46,12 @@ import { mapGetters } from 'vuex'
 import Hamburger from '@/components/Hamburger'
 
 export default {
+  name: '',
   components: {
     // Breadcrumb,
     Hamburger
   },
+  props: {},
   data() {
     return {
       defaultImg: require('@/assets/common/head.jpg')
@@ -55,6 +60,9 @@ export default {
   computed: {
     ...mapGetters(['sidebar', 'avatar', 'name', 'staffPhoto'])
   },
+  watch: {},
+  // created () {},
+  // mounted () {},
   methods: {
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')

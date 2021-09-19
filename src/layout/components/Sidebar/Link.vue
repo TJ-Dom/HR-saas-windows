@@ -8,12 +8,17 @@
 import { isExternal } from '@/utils/validate'
 
 export default {
+  name: '',
+  components: {},
   props: {
     to: {
       type: String,
       required: true
     }
   },
+  // data () {
+  //   return {}
+  // },
   computed: {
     isExternal() {
       return isExternal(this.to)
@@ -25,6 +30,9 @@ export default {
       return 'router-link'
     }
   },
+  watch: {},
+  // created () {},
+  // mounted () {},
   methods: {
     linkProps(to) {
       if (this.isExternal) {

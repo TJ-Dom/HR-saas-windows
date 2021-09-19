@@ -19,12 +19,20 @@
 <script>
 export default {
   name: 'Hamburger',
+  components: {},
   props: {
     isActive: {
       type: Boolean,
       default: false
     }
   },
+  // data () {
+  //   return {}
+  // },
+  computed: {},
+  watch: {},
+  // created () {},
+  // mounted () {},
   methods: {
     toggleClick() {
       this.$emit('toggleClick')

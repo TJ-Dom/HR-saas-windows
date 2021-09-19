@@ -11,6 +11,7 @@
 <script>
 export default {
   name: 'SidebarLogo',
+  components: {},
   props: {
     collapse: {
       type: Boolean,
@@ -23,7 +24,12 @@ export default {
       logo:
         'https://wpimg.wallstcn.com/69a1c46c-eb1c-4b46-8bd4-e9e686ef5251.png'
     }
-  }
+  },
+  computed: {},
+  watch: {},
+  // created () {},
+  // mounted () {},
+  methods: {}
 }
 </script>
 

@@ -9,11 +9,20 @@
 <script>
 export default {
   name: 'AppMain',
+  components: {},
+  props: {},
+  // data () {
+  //   return {}
+  // },
   computed: {
     key() {
       return this.$route.path
     }
-  }
+  },
+  watch: {},
+  // created () {},
+  // mounted () {},
+  methods: {}
 }
 </script>
 
@@ -25,7 +34,7 @@ export default {
   position: relative;
   overflow: hidden;
 }
-.fixed-header+.app-main {
+.fixed-header + .app-main {
   padding-top: 50px;
 }
 </style>
