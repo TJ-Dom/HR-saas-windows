@@ -4,8 +4,12 @@
       <PageTools :show-before="true">
         <span slot="before">共{{ page.total }}条记录</span>
         <template #after>
-          <el-button slot="small" type="warning">导入</el-button>
-          <el-button slot="small" type="danger">导出</el-button>
+          <el-button
+            slot="small"
+            type="warning"
+            @click="$router.push('./import')"
+          >excel导入</el-button>
+          <el-button slot="small" type="danger">excel导出</el-button>
           <el-button
             slot="small"
             type="primary"
@@ -124,7 +128,7 @@ export default {
         await this.$confirm('您确定删除该员工吗')
         await deleteEmployee(id)
         this.getEmployeeList()
-        this.$message('删除员工成功')
+        this.$message.success('删除员工成功')
       } catch (err) {
         console.log(err)
       }
