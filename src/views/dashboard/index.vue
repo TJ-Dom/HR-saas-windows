@@ -9,6 +9,7 @@
         <el-button type="danger">删除</el-button>
       </template>
     </PageTools>
+    <UploadExcel />
   </div>
 </template>
 
