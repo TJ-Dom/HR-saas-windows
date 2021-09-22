@@ -9,7 +9,11 @@
             type="warning"
             @click="$router.push('./import')"
           >excel导入</el-button>
-          <el-button slot="small" type="danger">excel导出</el-button>
+          <el-button
+            slot="small"
+            type="danger"
+            @click="exportData"
+          >excel导出</el-button>
           <el-button
             slot="small"
             type="primary"
@@ -43,7 +47,11 @@
           </el-table-column>
           <el-table-column label="操作" sortable="" fixed="right" width="280">
             <template v-slot="{ row }">
-              <el-button type="text" size="small">查看</el-button>
+              <el-button
+                type="text"
+                size="small"
+                @click="$router.push(`./employees/detail/${row.id}`)"
+              >查看</el-button>
               <el-button type="text" size="small">转正</el-button>
               <el-button type="text" size="small">调岗</el-button>
               <el-button type="text" size="small">离职</el-button>
@@ -82,6 +90,7 @@
 import { getEmployeeList, deleteEmployee } from '@/api/employees'
 import EmployeeEnum from '@/api/constant/employees' // 引入员工的枚举对象
 import AddDemployee from './components/add-employee'
+import { formatDate } from '@/filters'
 export default {
   name: '',
   components: {
@@ -132,6 +141,82 @@ export default {
       } catch (err) {
         console.log(err)
       }
+    },
+    // 导出excel数据
+    exportData() {
+      // 表头对应关系
+      const headers = {
+        姓名: 'username',
+        手机号: 'mobile',
+        入职日期: 'timeOfEntry',
+        聘用形式: 'formOfEmployment',
+        转正日期: 'correctionTime',
+        工号: 'workNumber',
+        部门: 'departmentName'
+      }
+      // 懒加载
+      import('@/vendor/Export2Excel').then(async excel => {
+        const { rows } = await getEmployeeList({
+          page: 1,
+          size: this.page.total
+        }) // 获取请求获取信息接口
+        const data = this.formatJson(headers, rows) // 得到全部数据
+        // 导出excel 这里的excel是引入文件的导出对象
+        // 获取所有的数据
+        // 模板
+        // excel.export_json_to_excel({
+        //   header: ['姓名', '薪资'], // 导出数据的表头 必填 Array 默认值[]
+        //   data: [
+        //     ['张三', 12000],
+        //     ['李四', 5000]
+        //   ], // 导出的具体数据 必填 Array 默认值[[]]
+        //   filename: '员工薪资表', // 导出文件名 非必填 默认值excel-list
+        //   autoWidth: true, // 单元格是否要自适应宽度 Boolean 默认值 true
+        //   bookType: 'csv' // 导出文件类型 String 可选xlsx, csv, txt等 默认值 xlsx
+        // })
+        const multiHeader = [['姓名', '主要信息', '', '', '', '', '部门']]
+        const merges = ['A1:A2', 'B1:F1', 'G1:G2']
+        excel.export_json_to_excel({
+          header: Object.keys(headers),
+          data,
+          filename: '员工信息表',
+          multiHeader, // 复杂表头
+          merges, // 合并选项
+          autoWidth: true,
+          bookType: 'xlsx'
+        })
+      })
+    },
+    // 该方法负责将数组转化成二维数组
+    // 将表头数据和数据进行对应
+    // [{}]  =>   [[]]
+    formatJson(headers, rows) {
+      // 首先遍历数组
+      // 要转化 数据结构 还要和表头的顺序对应上 要求转出的标题是中文的
+      // [{username:'张三'，3000}，{moblie:1325...}]=>[[]]
+      // 目的： [{ username: '张三'},{},{}]  => [[’张三'],[],[]]
+      return rows.map(item => {
+        // item是一个对象  { mobile: 132111,username: '张三'  }
+        // ["手机号", "姓名", "入职日期" 。。]
+        return Object.keys(headers).map(key => {
+          // 需要判断 字段
+          if (
+            headers[key] === 'timeOfEntry' ||
+            headers[key] === 'correctionTime'
+          ) {
+            // 解决时间格式化问题
+            return formatDate(item[headers[key]]) // 返回格式化之前的时间
+          } else if (headers[key] === 'formOfEmployment') {
+            // 解决聘用形式的转化问题
+            var en = EmployeeEnum.hireType.find(
+              obj => obj.id === item[headers[key]]
+            )
+            return en ? en.value : '未知'
+          }
+          return item[headers[key]]
+        })
+      })
+      // 简写return rows.map(item => Object.keys(headers).map(key => item[headers[key]])) 但需要处理时间格式化问题
     }
   }
 }
