@@ -58,6 +58,7 @@
         <el-col :span="12">
           <el-form-item label="员工头像">
             <!-- 放置上传图片 -->
+            <ImageUpload ref="staffPhoto" />
           </el-form-item>
         </el-col>
       </el-row>
@@ -88,9 +89,10 @@
         </el-form-item>
         <!-- 个人头像 -->
         <!-- 员工照片 -->
-
         <el-form-item label="员工照片">
           <!-- 放置上传图片 -->
+          <!-- ref不要重名 -->
+          <ImageUpload ref="myStaffPhoto" />
         </el-form-item>
         <el-form-item label="国家/地区">
           <el-select v-model="formData.nationalArea" class="inputW2">
@@ -476,19 +478,45 @@ export default {
   },
   // mounted() {},
   methods: {
-    // 获取个人信息
+    // 获取个人信息 读取上半部分的内容
     async getUserDetailById() {
       this.userInfo = await getUserDetailById(this.userId)
+      if (this.userInfo.staffPhoto) {
+        // 有值代表 已经有一个上传成功的图片
+        // 这里我们赋值，同时需要给赋值的地址一个标记 upload: true 表示上传成功
+        this.$refs.staffPhoto.fileList = [
+          { url: this.userInfo.staffPhoto, upload: true }
+        ]
+      }
     },
-    // 获取个人详情信息
+    // 获取个人详情信息 读取下半部分内容
     async getPersonalDetail() {
       this.formData = await getPersonalDetail(this.userId)
+      if (this.formData.staffPhoto) {
+        // 有值代表 已经有一个上传成功的图片
+        // 这里我们赋值，同时需要给赋值的地址一个标记 upload: true 表示上传成功
+        this.$refs.myStaffPhoto.fileList = [
+          { url: this.formData.staffPhoto, upload: true }
+        ]
+      }
     },
     // 更新个人信息
     async saveUser() {
       try {
-        await saveUserDetailById(this.userInfo)
+        // 去读取 员工上传的头像
+        const fileList = this.$refs.staffPhoto.fileList // 数组
+        if (fileList.some(item => !item.upload)) {
+          // 找到upload为false 说明 有图片还没有上传完成
+          this.$message.warning('您当前还有图片没有上传完成！')
+          return
+        }
+        // 通过合并 得到一个新对象 --staffPhoto 由于接口问题 必须 给一个 有空格的字符串才能存进去
+        await saveUserDetailById({
+          ...this.userInfo,
+          staffPhoto: fileList.length ? fileList[0].url : ' '
+        })
         this.$message.success('更新个人信息成功！')
+        this.$router.go(0)
       } catch (err) {
         console.log(err)
       }
@@ -496,8 +524,20 @@ export default {
     // 更新个人详情信息
     async savePersonal() {
       try {
-        await updatePersonal(this.formData)
+        // 去读取 员工上传的头像
+        const fileList = this.$refs.myStaffPhoto.fileList // 数组
+        if (fileList.some(item => !item.upload)) {
+          // 找到upload为false 说明 有图片还没有上传完成
+          this.$message.warning('您当前还有图片没有上传完成！')
+          return
+        }
+        // 通过合并 得到一个新对象 --staffPhoto 由于接口问题 必须 给一个 有空格的字符串才能存进去
+        await updatePersonal({
+          ...this.formData,
+          staffPhoto: fileList.length ? fileList[0].url : ' '
+        })
         this.$message.success('更新个人信息成功！')
+        this.$router.go(0)
       } catch (err) {
         console.log(err)
       }
