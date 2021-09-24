@@ -75,10 +75,9 @@ export const constantRoutes = [
         component: () => import('@/views/import/index')
       }
     ]
-  },
+  }
 
   // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
 ]
 // 动态路由
 // 定义一个动态路由变量  导出变量， 后面做权限的时候会用到

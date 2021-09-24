@@ -1,5 +1,6 @@
 import { getToken, setToken, removeToken, setTimeStamp } from '@/utils/auth'
 import { login, getUserInfo, getUserDetailById } from '@/api/user'
+import { resetRouter } from '@/router' // 引入重置路由的方法
 // 状态
 // 初始化的时候从缓存中读取状态 并赋值到初始化的状态上
 // Vuex的持久化 如何实现 ？ Vuex和前端缓存相结合
@@ -60,6 +61,20 @@ const actions = {
     context.commit('removeToken') // 不仅仅删除了vuex中的 还删除了缓存中的
     // 删除用户资料
     context.commit('reomveUserInfo') // 删除用户信息
+    // 重置路由
+    resetRouter()
+    // 还有一步  vuex中的数据是不是还在
+    // 要清空permission模块下的state数据
+    // vuex中 user子模块  permission子模块
+    // 子模块调用子模块的action  默认情况下 子模块的context是子模块的
+    // 父模块 调用 子模块的action
+    // vuex子模块怎么调用子模块的action
+    // 1. 都没加锁的情况下 可以随意调用
+    // 2. 都加锁的情况下 寻求第三参数来解决
+    // 加了命名空间的context指的不是全局的context
+    // 参数1：mutations名称 参数2：载荷payload 参数3：{root：true} 调用根级的mutations或action
+    context.commit('permission/setRoutes', [], { root: true })
+    // 子模块调用子模块的action 可以 将 commit的第三个参数 设置成  { root: true } 就表示当前的context不是子模块了 而是父模块
   }
 }
 export default {
