@@ -54,7 +54,7 @@ export default {
   props: {},
   data() {
     return {
-      defaultImg: require('@/assets/common/mine.jpeg')
+      defaultImg: require('@/assets/common/default.jpeg')
     }
   },
   computed: {

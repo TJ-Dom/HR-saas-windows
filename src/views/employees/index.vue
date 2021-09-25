@@ -31,7 +31,7 @@
             <!-- 插槽 -->
             <template v-slot="{ row }">
               <img
-                v-imagerror="require('@/assets/common/mine.jpeg')"
+                v-imagerror="require('@/assets/common/default.jpeg')"
                 :src="row.staffPhoto"
                 alt=""
                 style="border-radius: 50%; width: 100px; height: 100px; padding: 10px"
