@@ -17,6 +17,9 @@ import '@/icons' // icon
 import '@/permission' // permission control
 import * as filters from '@/filters' // 引入工具类
 import * as directives from '@/directives'
+import checkPermission from '@/mixin/checkPermission' // 引入
+// 全局混入检查对象
+Vue.mixin(checkPermission) // 表示所有的组件都拥有了检查的方法
 // 注册自定义指令
 // 遍历所有的导出的指令对象 完成自定义全局注册
 Object.keys(directives).forEach(key => {

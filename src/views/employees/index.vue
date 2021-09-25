@@ -16,6 +16,7 @@
           >excel导出</el-button>
           <el-button
             slot="small"
+            :disabled="checkPermission('POINT-USER-ADD')"
             type="primary"
             @click="showDialog = true"
           >新增员工</el-button>
@@ -60,6 +61,7 @@
           <el-table-column label="操作" sortable="" fixed="right" width="280">
             <template v-slot="{ row }">
               <el-button
+                :disabled="!checkPermission('POINT-USER-UPDATE')"
                 type="text"
                 size="small"
                 @click="$router.push(`./employees/detail/${row.id}`)"
@@ -73,6 +75,7 @@
                 @click="editRole(row.id)"
               >角色</el-button>
               <el-button
+                :disabled="checkPermission('point-user-delete')"
                 type="text"
                 size="small"
                 @click="deleteEmployee(row.id)"
